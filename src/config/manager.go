@@ -1,8 +1,8 @@
 package config
 
 import (
-	"dawn-bot/src/src/db/postgres"
-	"dawn-bot/src/src/db/redis"
+	"dawn-bot/src/db/postgres"
+	"dawn-bot/src/db/redis"
 	"dawn-bot/src/utils"
 	"github.com/pelletier/go-toml"
 	"os"

@@ -1,6 +1,11 @@
 package postgres
 
-import "strconv"
+import (
+	"dawn-bot/src/utils"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"strconv"
+)
 
 type PostgresOptions struct {
 	Host     string `toml:"host"`
@@ -11,10 +16,24 @@ type PostgresOptions struct {
 	Timezone string `toml:"timezone"`
 }
 
-var options string
+// Connect to the database
+func (o *PostgresOptions) Connect() {
+	GenerateDns(*o)
+	Connect()
+}
 
-// GenerateDns Generate the dns to connect to the postgres database
+var options string
+var Db *gorm.DB
+
+// GenerateDns generate the dns to connect to the postgres database
 func GenerateDns(o PostgresOptions) {
 	options = "host=" + o.Host + " user=" + o.User + " password=" + o.Password + " dbname=" + o.Db + " port=" + strconv.Itoa(int(o.Port))
 	options = options + " sslmod=disable TimeZone=" + o.Timezone
+}
+
+// Connect the database
+func Connect() {
+	var err error
+	Db, err = gorm.Open(postgres.Open(options), &gorm.Config{})
+	utils.PanicError(err)
 }

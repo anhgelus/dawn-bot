@@ -10,7 +10,7 @@ type RedisOptions struct {
 
 var client *redis.Client
 
-// ConnectClient Connect to the Redis Client
+// ConnectClient connect to the Redis Client
 func ConnectClient(o RedisOptions) {
 	options := o.toOptions()
 	client = redis.NewClient(&options)
@@ -22,4 +22,9 @@ func (o *RedisOptions) toOptions() redis.Options {
 		Password: o.Password,
 		DB:       o.DB,
 	}
+}
+
+// Connect to the RedisClient
+func (o *RedisOptions) Connect() {
+	ConnectClient(*o)
 }

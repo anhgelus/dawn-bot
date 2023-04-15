@@ -1,9 +1,7 @@
 package main
 
 import (
-	"dawn-bot/src/src/config"
-	"dawn-bot/src/src/db/postgres"
-	"dawn-bot/src/src/db/redis"
+	"dawn-bot/src/config"
 	"dawn-bot/src/utils"
 	"embed"
 	"fmt"
@@ -22,6 +20,7 @@ func main() {
 	utils.PanicError(err)
 
 	generateConfigs()
+	loadConfigs()
 
 	token := os.Args[1]
 	client, err := discordgo.New("Bot " + token)
@@ -58,6 +57,6 @@ func generateConfigs() {
 
 func loadConfigs() {
 	databases := config.LoadAndImportDatabaseConfig()
-	postgres.GenerateDns(databases.Postgres)
-	redis.ConnectClient(databases.Redis)
+	databases.Postgres.Connect()
+	databases.Redis.Connect()
 }
