@@ -19,3 +19,5 @@ Dawn Bot is powered by
 - Discord Go
 - pelletier/go-toml
 - GORM
+- go-redis
+- PostGreSQL and Redis
