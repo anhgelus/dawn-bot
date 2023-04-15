@@ -5,6 +5,7 @@ import (
 	"dawn-bot/src/src/db/postgres"
 	"dawn-bot/src/src/db/redis"
 	"dawn-bot/src/utils"
+	"embed"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"os"
@@ -12,7 +13,16 @@ import (
 	"syscall"
 )
 
+//go:embed resources/config
+var configs embed.FS
+
 func main() {
+	var err error
+	utils.GlobalPath, err = os.Executable()
+	utils.PanicError(err)
+
+	generateConfigs()
+
 	token := os.Args[1]
 	client, err := discordgo.New("Bot " + token)
 	utils.PanicError(err)
@@ -28,6 +38,22 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	client.Close()
+}
+
+func generateConfigs() {
+	err := os.Mkdir("config", 0666)
+	utils.PanicError(err)
+	if !utils.FileExist(utils.FilePath("/config/databases.toml")) {
+		file, err := os.Create("config/databases.toml")
+		utils.PanicError(err)
+		defer file.Close()
+
+		content, err := configs.ReadFile("resources/config/databases.toml")
+		utils.PanicError(err)
+
+		_, err = file.Write(content)
+		utils.PanicError(err)
+	}
 }
 
 func loadConfigs() {
