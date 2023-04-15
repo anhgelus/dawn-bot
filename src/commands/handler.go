@@ -63,3 +63,11 @@ func respondOnError(s *discordgo.Session, i *discordgo.InteractionCreate, c stri
 	})
 	utils.PanicError(err)
 }
+
+func Handler(s *discordgo.Session) {
+	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		if h, ok := Handlers[i.ApplicationCommandData().Name]; ok {
+			h(s, i)
+		}
+	})
+}

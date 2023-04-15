@@ -12,6 +12,7 @@ var (
 		Options: []*discordgo.ApplicationCommandOption{
 			{
 				Name: "parameter",
+				Description: "Paramètre à modifier",
 				Type: discordgo.ApplicationCommandOptionInteger,
 				Choices: []*discordgo.ApplicationCommandOptionChoice{
 					{
@@ -38,9 +39,10 @@ var (
 
 func Init(s *discordgo.Session) {
 	for i, c := range Commands {
-		_, err := s.ApplicationCommandCreate(s.State.User.ID, "", c)
+		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, "", c)
 		utils.PanicError(err)
-		RegisteredCommands[i] = c
+		println(cmd.Name)
+		RegisteredCommands[i] = cmd
 	}
 }
 

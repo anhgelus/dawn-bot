@@ -43,14 +43,19 @@ func main() {
 
 	client.Identify.Intents = discordgo.MakeIntent(intents)
 
+
 	err = client.Open()
+	commands.Init(client)
+	commands.Handler(client)
+
 	utils.PanicError(err)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	// Cleanly close down the Discord session.
+	// Cleanly close down the Discord session.*
+	commands.Remove(client)
 	client.Close()
 }
 
