@@ -2,6 +2,8 @@ package main
 
 import (
 	"dawn-bot/src/config"
+	"dawn-bot/src/db/postgres"
+	"dawn-bot/src/event"
 	"dawn-bot/src/utils"
 	"embed"
 	"fmt"
@@ -14,6 +16,10 @@ import (
 //go:embed resources/config
 var configs embed.FS
 
+const (
+	intents = discordgo.IntentsAll
+)
+
 func main() {
 	var err error
 	utils.GlobalPath, err = os.Executable()
@@ -21,12 +27,16 @@ func main() {
 
 	generateConfigs()
 	loadConfigs()
+	temp := postgres.Migrate()
+	config.Config = temp.ToDBConfig()
 
 	token := os.Args[1]
 	client, err := discordgo.New("Bot " + token)
 	utils.PanicError(err)
 
-	client.Identify.Intents = discordgo.IntentsGuildMessages
+	client.AddHandler(event.HandleJoin)
+
+	client.Identify.Intents = discordgo.MakeIntent(intents)
 
 	err = client.Open()
 	utils.PanicError(err)

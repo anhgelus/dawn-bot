@@ -1,7 +1,9 @@
 package postgres
 
 import (
+	"dawn-bot/src/config"
 	"dawn-bot/src/utils"
+	"errors"
 	"gorm.io/gorm"
 )
 
@@ -36,8 +38,17 @@ type Mod struct {
 	Mod        User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
+type Config struct {
+	gorm.Model
+	WelcomeChannelID string
+}
+
+func (c *Config) ToDBConfig() config.DBConfig {
+	return config.DBConfig{WelcomeChannelID: c.WelcomeChannelID}
+}
+
 // Migrate do the migration of database
-func Migrate() {
+func Migrate() Config {
 	err := Db.AutoMigrate(&District{})
 	utils.PanicError(err)
 	err = Db.AutoMigrate(&User{})
@@ -46,4 +57,15 @@ func Migrate() {
 	utils.PanicError(err)
 	err = Db.AutoMigrate(&Mod{})
 	utils.PanicError(err)
+	err = Db.AutoMigrate(&Config{})
+	utils.PanicError(err)
+
+	var conf Config
+	result := Db.First(&conf)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		Db.Create(&Config{
+			WelcomeChannelID: "",
+		})
+	}
+	return conf
 }
