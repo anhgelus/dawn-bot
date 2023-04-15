@@ -1,7 +1,6 @@
 package event
 
 import (
-	"dawn-bot/src/config"
 	"dawn-bot/src/db/postgres"
 	"dawn-bot/src/utils"
 	"github.com/bwmarrin/discordgo"
@@ -15,6 +14,6 @@ func HandleJoin(s *discordgo.Session, j *discordgo.GuildMemberAdd) {
 		XP:        0,
 	}
 	postgres.Db.Create(&user)
-	_, err := s.ChannelMessageSend(config.Config.WelcomeChannelID, "Bienvenue "+member.Mention()+" sur Dawn City !")
+	_, err := s.ChannelMessageSend(postgres.ConfigDB.WelcomeChannelID, "Bienvenue "+member.Mention()+" sur Dawn City !")
 	utils.PanicError(err)
 }

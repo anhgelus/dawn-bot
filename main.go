@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dawn-bot/src/commands"
 	"dawn-bot/src/config"
 	"dawn-bot/src/db/postgres"
 	"dawn-bot/src/event"
@@ -27,14 +28,14 @@ func main() {
 
 	generateConfigs()
 	loadConfigs()
-	temp := postgres.Migrate()
-	config.Config = temp.ToDBConfig()
+	postgres.ConfigDB = postgres.Migrate()
 
 	token := os.Args[1]
 	client, err := discordgo.New("Bot " + token)
 	utils.PanicError(err)
 
 	client.AddHandler(event.HandleJoin)
+	client.AddHandler(commands.GlobalHandler)
 
 	client.Identify.Intents = discordgo.MakeIntent(intents)
 

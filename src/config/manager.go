@@ -13,12 +13,6 @@ type DatabasesConfig struct {
 	Redis    redis.RedisOptions
 }
 
-type DBConfig struct {
-	WelcomeChannelID string
-}
-
-var Config DBConfig
-
 func LoadAndImportDatabaseConfig() DatabasesConfig {
 	path, err := os.Executable()
 	utils.PanicError(err)

@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"dawn-bot/src/config"
 	"dawn-bot/src/utils"
 	"errors"
 	"gorm.io/gorm"
@@ -41,10 +40,6 @@ type Mod struct {
 type Config struct {
 	gorm.Model
 	WelcomeChannelID string
-}
-
-func (c *Config) ToDBConfig() config.DBConfig {
-	return config.DBConfig{WelcomeChannelID: c.WelcomeChannelID}
 }
 
 // Migrate do the migration of database
