@@ -1,3 +1,3 @@
 package config
 
-const ConfigPath = "config/"
+const Path = "config/"

@@ -43,7 +43,6 @@ func main() {
 
 	client.Identify.Intents = discordgo.MakeIntent(intents)
 
-
 	err = client.Open()
 	commands.Init(client)
 	commands.Handler(client)

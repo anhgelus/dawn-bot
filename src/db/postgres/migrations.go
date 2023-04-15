@@ -17,8 +17,9 @@ type User struct {
 
 type District struct {
 	gorm.Model
-	Name string `gorm:"size:256"`
-	Max  uint8
+	Name   string `gorm:"size:256"`
+	Max    uint8
+	RoleID string `gorm:"size:21"`
 }
 
 type Sanction struct {

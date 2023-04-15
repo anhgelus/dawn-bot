@@ -14,7 +14,7 @@ type DatabasesConfig struct {
 }
 
 func LoadAndImportDatabaseConfig() DatabasesConfig {
-	c, err := os.ReadFile(ConfigPath + "databases.toml")
+	c, err := os.ReadFile(Path + "databases.toml")
 	utils.PanicError(err)
 	var config DatabasesConfig
 	err = toml.Unmarshal(c, &config)
