@@ -8,8 +8,8 @@ services:
     depends_on:
       - db
       - redis
-    #volumes:
-      #- ./tmp:/app/config
+    volumes:
+      - ./tmp:/app/config
   db:
     image: postgres:alpine
     env_file:

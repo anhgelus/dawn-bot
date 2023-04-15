@@ -51,17 +51,22 @@ func main() {
 }
 
 func generateConfigs() {
-	err := os.Mkdir("config", 0666)
-	utils.PanicError(err)
-	if !utils.FileExist(utils.FilePath("/config/databases.toml")) {
+	err := os.Mkdir("config", 0777)
+	if err != nil {
+		println(err.Error())
+	}
+	if !utils.FileExist("config/databases.toml") {
+		println("the file do not exist")
 		file, err := os.Create("config/databases.toml")
 		utils.PanicError(err)
-		defer file.Close()
 
 		content, err := configs.ReadFile("resources/config/databases.toml")
 		utils.PanicError(err)
 
 		_, err = file.Write(content)
+		utils.PanicError(err)
+
+		err = file.Close()
 		utils.PanicError(err)
 	}
 }

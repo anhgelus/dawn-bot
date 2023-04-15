@@ -14,12 +14,10 @@ type DatabasesConfig struct {
 }
 
 func LoadAndImportDatabaseConfig() DatabasesConfig {
-	path, err := os.Executable()
-	utils.PanicError(err)
-	content, err := os.ReadFile(path + ConfigPath + "databases.toml")
+	c, err := os.ReadFile(ConfigPath + "databases.toml")
 	utils.PanicError(err)
 	var config DatabasesConfig
-	err = toml.Unmarshal(content, &config)
+	err = toml.Unmarshal(c, &config)
 	utils.PanicError(err)
 
 	return config
