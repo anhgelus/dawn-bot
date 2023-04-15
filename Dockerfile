@@ -6,6 +6,6 @@ COPY . .
 
 RUN go mod tidy && go build -o dawn-bot .
 
-ARG token
+ENV TOKEN = ""
 
-CMD ./dawn-bot
+CMD ./dawn-bot $TOKEN

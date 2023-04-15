@@ -30,6 +30,10 @@ func main() {
 	loadConfigs()
 	postgres.ConfigDB = postgres.Migrate()
 
+	if len(os.Args) != 2 {
+		println("You must provide only the token")
+		return
+	}
 	token := os.Args[1]
 	client, err := discordgo.New("Bot " + token)
 	utils.PanicError(err)
