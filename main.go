@@ -1,6 +1,9 @@
 package main
 
 import (
+	"dawn-bot/src/src/config"
+	"dawn-bot/src/src/db/postgres"
+	"dawn-bot/src/src/db/redis"
 	"dawn-bot/src/utils"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -25,4 +28,10 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	client.Close()
+}
+
+func loadConfigs() {
+	databases := config.LoadAndImportDatabaseConfig()
+	postgres.GenerateDns(databases.Postgres)
+	redis.ConnectClient(databases.Redis)
 }
