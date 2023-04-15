@@ -56,7 +56,7 @@ func Migrate() Config {
 	utils.PanicError(err)
 
 	var conf Config
-	result := Db.First(&conf)
+	result := Db.Find(&conf)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		Db.Create(&Config{
 			WelcomeChannelID: "",
