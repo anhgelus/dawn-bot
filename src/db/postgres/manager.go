@@ -30,7 +30,7 @@ var Db *gorm.DB
 // GenerateDns generate the dns to connect to the postgres database
 func GenerateDns(o PostgresOptions) {
 	options = "host=" + o.Host + " user=" + o.User + " password=" + o.Password + " dbname=" + o.Db + " port=" + strconv.Itoa(int(o.Port))
-	options = options + " sslmod=disable TimeZone=" + o.Timezone
+	options = options + " sslmode=disable TimeZone=" + o.Timezone
 }
 
 // Connect the database
