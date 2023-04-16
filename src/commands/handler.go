@@ -17,12 +17,11 @@ func GlobalHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if !valid {
 		panic("impossible to find the slash command with the name " + i.ApplicationCommandData().Name)
 	}
-	t(s, i)
+	t(commandHandler{s: s, i: i})
 }
 
-func ConfigHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	cm := commandHandler{s: s, i: i}
-	options := i.ApplicationCommandData().Options
+func configHandler(cm commandHandler) {
+	options := cm.i.ApplicationCommandData().Options
 	if len(options) != 2 {
 		cm.respond("Il semblerait que vous avez oublié de remplir toutes les options...")
 		return
@@ -44,11 +43,11 @@ func ConfigHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	value := option.StringValue()
 	var param string
 
-	conf, _ := config.GetConfig(i.GuildID)
+	conf, _ := config.GetConfig(cm.i.GuildID)
 
 	switch typ {
 	case 1:
-		if !utils.IsChannelId(s, value) {
+		if !utils.IsChannelId(cm.s, value) {
 			cm.respond("Impossible de trouver le salon avec l'ID `" + value + "`")
 			return
 		}
@@ -61,6 +60,13 @@ func ConfigHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	postgres.Db.Save(&conf)
 	cm.respond("Le paramètre `" + param + "` a bien été changé en `" + value + "`")
 }
+
+//func getConfigHandler(cm commandHandler) {
+//	conf, nw := config.GetConfig(cm.i.GuildID)
+//	if nw {
+//		cm.respond("Vous n'avez pas encore défini de config sur ce serveur :3")
+//	}
+//}
 
 func optionsArrayToMap(o []*discordgo.ApplicationCommandInteractionDataOption) map[string]*discordgo.ApplicationCommandInteractionDataOption {
 	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(o))

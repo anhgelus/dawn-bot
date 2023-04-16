@@ -30,10 +30,15 @@ var (
 			},
 		},
 	}
+	getConfigCommand = &discordgo.ApplicationCommand{
+		Name:        "get-config",
+		Description: "Récupère la config du bot",
+	}
 	RegisteredCommands = make([]*discordgo.ApplicationCommand, 1)
 	Commands           = [1]*discordgo.ApplicationCommand{configCommand}
-	Handlers           = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
-		configCommand.Name: ConfigHandler,
+	Handlers           = map[string]func(commandHandler){
+		configCommand.Name:    configHandler,
+		getConfigCommand.Name: getConfigHandler,
 	}
 )
 
