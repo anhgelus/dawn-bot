@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"dawn-bot/src/utils"
-	"errors"
 	"gorm.io/gorm"
 )
 
@@ -41,10 +40,11 @@ type Mod struct {
 type Config struct {
 	gorm.Model
 	WelcomeChannelID string
+	GuildID          string `gorm:"primaryKey;autoIncrement:false"`
 }
 
 // Migrate do the migration of database
-func Migrate() Config {
+func Migrate() {
 	err := Db.AutoMigrate(&District{})
 	utils.PanicError(err)
 	err = Db.AutoMigrate(&User{})
@@ -55,13 +55,4 @@ func Migrate() Config {
 	utils.PanicError(err)
 	err = Db.AutoMigrate(&Config{})
 	utils.PanicError(err)
-
-	var conf Config
-	result := Db.Find(&conf)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		Db.Create(&Config{
-			WelcomeChannelID: "",
-		})
-	}
-	return conf
 }

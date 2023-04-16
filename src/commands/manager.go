@@ -30,10 +30,15 @@ var (
 			},
 		},
 	}
-	RegisteredCommands = make([]*discordgo.ApplicationCommand, 1)
-	Commands           = [1]*discordgo.ApplicationCommand{configCommand}
-	Handlers           = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
-		configCommand.Name: ConfigHandler,
+	getConfigCommand = &discordgo.ApplicationCommand{
+		Name:        "get-config",
+		Description: "Récupère la config du bot",
+	}
+	RegisteredCommands = make([]*discordgo.ApplicationCommand, 2)
+	Commands           = [2]*discordgo.ApplicationCommand{configCommand, getConfigCommand}
+	Handlers           = map[string]func(commandHandler){
+		configCommand.Name:    configHandler,
+		getConfigCommand.Name: getConfigHandler,
 	}
 )
 

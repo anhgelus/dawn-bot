@@ -26,10 +26,13 @@ func main() {
 	utils.GlobalPath, err = os.Executable()
 	utils.PanicError(err)
 
+	// generate static configs file
 	generateConfigs()
 	loadConfigs()
-	postgres.ConfigDB = postgres.Migrate()
+	// Migrate the database
+	postgres.Migrate()
 
+	// Generate the websocket
 	if len(os.Args) != 2 {
 		println("You must provide only the token")
 		return
@@ -38,10 +41,13 @@ func main() {
 	client, err := discordgo.New("Bot " + token)
 	utils.PanicError(err)
 
+	// Handle classical event
 	client.AddHandler(event.HandleJoin)
 
+	// Add used intents
 	client.Identify.Intents = discordgo.MakeIntent(intents)
 
+	// Connect the bot
 	err = client.Open()
 	commands.Init(client)
 	client.AddHandler(commands.GlobalHandler)
@@ -52,7 +58,7 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	// Cleanly close down the Discord session.*
+	// Cleanly close down the Discord session.* and delete the slash commands
 	commands.Remove(client)
 	client.Close()
 }
