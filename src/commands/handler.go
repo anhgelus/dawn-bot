@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"dawn-bot/src/config"
 	"dawn-bot/src/db/postgres"
 	"dawn-bot/src/utils"
 	"github.com/bwmarrin/discordgo"
@@ -43,6 +44,8 @@ func ConfigHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	value := option.StringValue()
 	var param string
 
+	conf, _ := config.GetConfig(i.GuildID)
+
 	switch typ {
 	case 1:
 		if !utils.IsChannelId(s, value) {
@@ -50,12 +53,12 @@ func ConfigHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			return
 		}
 		param = "salon de bienvenue"
-		postgres.ConfigDB.WelcomeChannelID = value
+		conf.WelcomeChannelID = value
 	default:
 		cm.respond("Le paramètre entré n'existe pas :'(")
 		return
 	}
-	postgres.Db.Save(&postgres.ConfigDB)
+	postgres.Db.Save(&conf)
 	cm.respond("Le paramètre `" + param + "` a bien été changé en `" + value + "`")
 }
 

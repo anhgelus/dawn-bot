@@ -16,8 +16,6 @@ type PostgresOptions struct {
 	Timezone string `toml:"timezone"`
 }
 
-var ConfigDB Config
-
 // Connect to the database
 func (o *PostgresOptions) Connect() {
 	GenerateDns(*o)
