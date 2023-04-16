@@ -12,19 +12,22 @@ type User struct {
 	XP         uint32
 	DistrictID int
 	District   District `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	GuildID    string
 }
 
 type District struct {
 	gorm.Model
-	Name   string `gorm:"size:256"`
-	Max    uint8
-	RoleID string `gorm:"size:21"`
+	Name    string `gorm:"size:256"`
+	Max     uint
+	RoleID  string `gorm:"size:21"`
+	GuildID string
 }
 
 type Sanction struct {
 	gorm.Model
 	Name        string `gorm:"size:256"`
 	Description string `gorm:"size:1024"`
+	GuildID     string
 }
 
 type Mod struct {
@@ -35,6 +38,7 @@ type Mod struct {
 	Sanction   Sanction `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ModID      int
 	Mod        User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	GuildID    string
 }
 
 type Config struct {
