@@ -39,13 +39,12 @@ func main() {
 	utils.PanicError(err)
 
 	client.AddHandler(event.HandleJoin)
-	client.AddHandler(commands.GlobalHandler)
 
 	client.Identify.Intents = discordgo.MakeIntent(intents)
 
 	err = client.Open()
 	commands.Init(client)
-	commands.Handler(client)
+	client.AddHandler(commands.GlobalHandler)
 
 	utils.PanicError(err)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")

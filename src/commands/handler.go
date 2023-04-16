@@ -6,18 +6,24 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+type commandHandler struct {
+	s *discordgo.Session
+	i *discordgo.InteractionCreate
+}
+
 func GlobalHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	t, valid := Handlers[i.ApplicationCommandData().ID]
+	t, valid := Handlers[i.ApplicationCommandData().Name]
 	if !valid {
-		panic("impossible to find the slash command with the id " + i.ID)
+		panic("impossible to find the slash command with the name " + i.ApplicationCommandData().Name)
 	}
 	t(s, i)
 }
 
 func ConfigHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	cm := commandHandler{s: s, i: i}
 	options := i.ApplicationCommandData().Options
 	if len(options) != 2 {
-		respondOnError(s, i, "Il semblerait que vous avez oublié de remplir toutes les options...")
+		cm.respond("Il semblerait que vous avez oublié de remplir toutes les options...")
 		return
 	}
 	values := optionsArrayToMap(options)
@@ -25,25 +31,32 @@ func ConfigHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	var option *discordgo.ApplicationCommandInteractionDataOption
 	var ok bool
 	if option, ok = values["parameter"]; !ok {
-		respondOnError(s, i, "Impossible de trouver le paramètre à modifier :(")
+		cm.respond("Impossible de trouver le paramètre à modifier :(")
 		return
 	}
 	typ := option.IntValue()
 
 	if option, ok = values["value"]; !ok {
-		respondOnError(s, i, "Impossible de trouver la valeur à entrer :(")
+		cm.respond("Impossible de trouver la valeur à entrer :(")
 		return
 	}
 	value := option.StringValue()
+	var param string
 
 	switch typ {
 	case 1:
+		if !utils.IsChannelId(s, value) {
+			cm.respond("Impossible de trouver le salon avec l'ID `" + value + "`")
+			return
+		}
+		param = "salon de bienvenue"
 		postgres.ConfigDB.WelcomeChannelID = value
 	default:
-		respondOnError(s, i, "Le paramètre entré n'existe pas :'(")
+		cm.respond("Le paramètre entré n'existe pas :'(")
 		return
 	}
 	postgres.Db.Save(&postgres.ConfigDB)
+	cm.respond("Le paramètre `" + param + "` a bien été changé en `" + value + "`")
 }
 
 func optionsArrayToMap(o []*discordgo.ApplicationCommandInteractionDataOption) map[string]*discordgo.ApplicationCommandInteractionDataOption {
@@ -54,20 +67,12 @@ func optionsArrayToMap(o []*discordgo.ApplicationCommandInteractionDataOption) m
 	return optionMap
 }
 
-func respondOnError(s *discordgo.Session, i *discordgo.InteractionCreate, c string) {
-	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+func (cm commandHandler) respond(c string) {
+	err := cm.s.InteractionRespond(cm.i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: c,
 		},
 	})
 	utils.PanicError(err)
-}
-
-func Handler(s *discordgo.Session) {
-	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := Handlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
-		}
-	})
 }

@@ -11,9 +11,9 @@ var (
 		Description: "Config le bot",
 		Options: []*discordgo.ApplicationCommandOption{
 			{
-				Name: "parameter",
+				Name:        "parameter",
 				Description: "Paramètre à modifier",
-				Type: discordgo.ApplicationCommandOptionInteger,
+				Type:        discordgo.ApplicationCommandOptionInteger,
 				Choices: []*discordgo.ApplicationCommandOptionChoice{
 					{
 						Name:  "welcome-channel",
@@ -33,7 +33,7 @@ var (
 	RegisteredCommands = make([]*discordgo.ApplicationCommand, 1)
 	Commands           = [1]*discordgo.ApplicationCommand{configCommand}
 	Handlers           = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
-		configCommand.ID: ConfigHandler,
+		configCommand.Name: ConfigHandler,
 	}
 )
 
@@ -41,7 +41,6 @@ func Init(s *discordgo.Session) {
 	for i, c := range Commands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, "", c)
 		utils.PanicError(err)
-		println(cmd.Name)
 		RegisteredCommands[i] = cmd
 	}
 }
