@@ -5,6 +5,7 @@ import (
 	"dawn-bot/src/db/postgres"
 	"dawn-bot/src/utils"
 	"github.com/bwmarrin/discordgo"
+	"time"
 )
 
 type commandHandler struct {
@@ -61,12 +62,47 @@ func configHandler(cm commandHandler) {
 	cm.respond("Le paramètre `" + param + "` a bien été changé en `" + value + "`")
 }
 
-//func getConfigHandler(cm commandHandler) {
-//	conf, nw := config.GetConfig(cm.i.GuildID)
-//	if nw {
-//		cm.respond("Vous n'avez pas encore défini de config sur ce serveur :3")
-//	}
-//}
+func getConfigHandler(cm commandHandler) {
+	guildID := cm.i.GuildID
+	conf, nw := config.GetConfig(guildID)
+	if nw {
+		cm.respond("Vous n'avez pas encore défini de config sur ce serveur :3")
+		return
+	}
+	guild, err := cm.s.Guild(guildID)
+	utils.PanicError(err)
+	embed := discordgo.MessageEmbed{
+		Type:        discordgo.EmbedTypeRich,
+		Title:       "Configuration du serveur " + guild.Name,
+		Description: "Détails :",
+		Color:       15418782,
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: "Dawn Bot © 2023 - AGPLv3",
+		},
+		Author: &discordgo.MessageEmbedAuthor{
+			Name: cm.i.Member.Nick,
+		},
+		Timestamp: time.Now().Format(time.RFC3339),
+	}
+	welcomeField := discordgo.MessageEmbedField{
+		Name:   "Salon de bienvenue",
+		Inline: true,
+	}
+
+	var fields []*discordgo.MessageEmbedField
+	if conf.WelcomeChannelID != "" {
+		welcome, err := cm.s.Channel(cm.i.ChannelID)
+		utils.PanicError(err)
+		welcomeField.Value = welcome.Mention()
+		fields = append(fields, &welcomeField)
+	}
+	if len(fields) == 0 {
+		embed.Description = "Vous n'avez aucune configuration particulière"
+	} else {
+		embed.Fields = fields
+	}
+	cm.respondWithEmbed(&embed)
+}
 
 func optionsArrayToMap(o []*discordgo.ApplicationCommandInteractionDataOption) map[string]*discordgo.ApplicationCommandInteractionDataOption {
 	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(o))
@@ -81,6 +117,16 @@ func (cm commandHandler) respond(c string) {
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: c,
+		},
+	})
+	utils.PanicError(err)
+}
+
+func (cm commandHandler) respondWithEmbed(e *discordgo.MessageEmbed) {
+	err := cm.s.InteractionRespond(cm.i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{e},
 		},
 	})
 	utils.PanicError(err)
